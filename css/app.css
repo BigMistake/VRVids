@@ -1,0 +1,16 @@
+.video {
+    padding: 0px;
+	border: 5px;
+	border-style:ridge;
+	border-color: grey;
+}
+
+body {
+	background-color: #0d131b;
+}
+
+nav {
+	height: 50px;
+	color: white;
+	padding: 5px;
+}

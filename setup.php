@@ -16,5 +16,5 @@
 	//Scrape all game names
 	$games = getAllGames($steamURL,$pages,$games);
 	//Save them all in the database
-	saveAllGames($games);
+	saveAllGames($games,"Database");
 ?>

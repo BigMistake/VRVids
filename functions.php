@@ -40,9 +40,11 @@
 						
 					//Get the game title from the span element, but check if it's empty first
 					if(!empty($game->find('.search_name > span.title', 0)->plaintext)){
-						//Get rid of those pesky weird characters, save for spaces
+						//Get the title
 						$result = $game->find('.search_name > span.title', 0)->plaintext;
-						$string = html_entity_decode(preg_replace("/[^A-Za-z0-9\-\s]/", "", $result));						
+						//Get rid of those pesky weird characters, save for spaces
+						$string = html_entity_decode(preg_replace("/[^A-Za-z0-9\-\s]/", "", $result));
+						//Push the resulting title into the array
 						$array['name'] = $string;
 					}
 					
@@ -62,45 +64,55 @@
 							break;
 							
 						default:
-							echo "Niks gevonden <br>";
+							echo "Found nothing<br>";
 					  }
 					}
 					
 					echo $array['name'] . " met platforms: " . $array['HTC'] . " " . $array['Rift'] . " " . $array['OSVR'] . "<br>";
-					
+
+					//Push everything into the array that we'll be saving in the database
 					$games[] = $array;
 				}
 			}
 		}
-		//Save to a json file for later
-		file_put_contents("results.json",json_encode($games));
 		
 		return $games;
 	}
 	
-	function saveAllGames($games){
+	function saveAllGames($games,$format){
+		switch($format){
+			case "JSON":
+				saveToJSON($games);
+				break;
+			case "Database":
+				saveToDatabase($games);
+				break;
+		}
+	}
+
+	function saveToDatabase($games){
 		$configs = include 'config.php';
 
 		$servername = $configs['servername'];
 		$username = $configs['username'];
 		$password = $configs['password'];
 		$dbname = $configs['dbname'];
-		
+
 		// Create connection
 		$conn = mysqli_connect($servername, $username, $password, $dbname);
 		// Check connection
 		if (!$conn) {
 			die("Connection failed: " . mysqli_connect_error());
 		}
-		
+
 		echo count($games);
-		
+
 		foreach($games as $game){
 			$name = $game['name'];
 			$htc = $game['HTC'];
 			$rift = $game['Rift'];
 			$osvr = $game['OSVR'];
-			
+
 			$sql = "INSERT IGNORE INTO vrvids_games.list (name,HTC,Rift,OSVR) VALUES ('$name','$htc','$rift','$osvr');";
 			if (mysqli_query($conn, $sql)) {
 				//echo "New record created successfully</br>";
@@ -111,7 +123,12 @@
 
 		mysqli_close($conn);
 	}
-	
+
+	function saveToJSON($games){
+		//Save to a json file for later
+		file_put_contents("results.json",json_encode($games));
+	}
+
 	function getVideos($vrgame){
 	    //But then replace those for plus signs for the Reddit search query
 		$redditstring = preg_replace("/\s/", "+",$vrgame);

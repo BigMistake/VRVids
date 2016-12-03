@@ -129,11 +129,27 @@
 		file_put_contents("results.json",json_encode($games));
 	}
 
-	function getVideos($vrgame){
+	function getVideos($vrgame, $platforms){
 	    //But then replace those for plus signs for the Reddit search query
 		$redditstring = preg_replace("/\s/", "+",$vrgame);
+
+		$HTC = "";
+		$Rift = "";
+		$OSVR = "";
+
+		//Sorry, this is the best I can think of right now
+		if($platforms[0] == 1){
+			$HTC = "Vive+";
+		}
+		if($platforms[1] == 1){
+			$Rift = "Oculus+";
+		}
+		if($platforms[2] == 1){
+			$OSVR = "OSVR+";
+		}
+
 		//Put it together nice and pretty
-		$redditurl = "https://www.reddit.com/r/vive/search.json?q=" . $redditstring . "site%3Ayoutube&restrict_sr=on&sort=relevance&t=all";
+		$redditurl = "https://www.reddit.com/r/" . $HTC . $Rift . $OSVR ."/search.json?q=" . $redditstring . "site%3Ayoutube&restrict_sr=on&sort=relevance&t=all";
 		//Actually get the page now
 		$source = getPage($redditurl);
 		//We want it in json of course
@@ -161,7 +177,8 @@
 			}
 			else {
 				echo "<div class='column video'>";
-				echo "<a href=\"" . $child['data']['url'] . "\"><img src='" . $cropped . "' height='" . $child['data']['secure_media']['oembed']['thumbnail_height'] . "' width='" . $child['data']['secure_media']['oembed']['thumbnail_width'] . "' ></a>";
+					//Use the information from the JSON search results to get the thumbnail url/width/height/title
+					echo "<a href=\"" . $child['data']['url'] . "\"><img src='" . $cropped . "' height='" . $child['data']['secure_media']['oembed']['thumbnail_height'] . "' width='" . $child['data']['secure_media']['oembed']['thumbnail_width'] . "' title='" . $child['data']['title'] . "' ></a>";
 				echo "</div>";
 			}
 		}

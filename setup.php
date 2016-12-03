@@ -15,6 +15,6 @@
 	$pages = getPageCount($steamURL);
 	//Scrape all game names
 	$games = getAllGames($steamURL,$pages,$games);
-	//Save them all in the database
+	//Save them all in the Database or JSON
 	saveAllGames($games,"Database");
 ?>

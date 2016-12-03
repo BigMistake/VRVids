@@ -22,6 +22,7 @@
 		<div class="small-12 columns">
 			<?php
 			include 'functions.php';
+			//Load the details for the database connection
 			$configs = include 'config.php';
 
 			$servername = $configs['servername'];
@@ -36,15 +37,18 @@
 				die("Connect failed: ".$mysqli->connect_error);
 			}
 
-			$query = "SELECT name FROM list ORDER BY name";
+			//Get the name and platforms of the games
+			$query = "SELECT name,HTC,Rift,OSVR FROM list ORDER BY name";
 			$result = $mysqli->query($query);
 
 
 			echo "<form action='#' method='post'><div class='row'>
 					<div class='small-8 small-centered columns'>
 						<select name='Game'>";
+			//For every row we get from the database, put it in an array
 			while($row = $result->fetch_array()){
-				echo "<option value='" . strtolower($row[0]) . "'>" . $row[0] . "</option>";
+				//Echo an option that also feeds in the platform information
+				echo "<option value='" . strtolower($row[0]) . "-" . $row[1] . "-" . $row[2] . "-" . $row[3] . "'>" . $row[0] . "</option>";
 			}
 			echo "</select>
 					</div>
@@ -52,8 +56,6 @@
 						<input type='submit' name='submit' class='button' value='Submit'>
 					</div>
 				</div></form>";
-			//$time = microtime(true) - $_SERVER["REQUEST_TIME_FLOAT"];
-			//echo "<row><div class='small-4 small-centered columns'>Process Time: {$time}</div></row>";
 			?>
 		</div>
 	</div>
@@ -62,8 +64,13 @@
 			<?php
 				echo "<div class='row small-up-1 medium-up-2 large-up-4'>";
 				if(isset($_POST['submit'])){
-					$selected_val = $_POST['Game'];  // Storing Selected Value In Variable
-					getVideos($selected_val);
+					//Divide the concatenated string with name and platforms
+					$values = explode("-",$_POST['Game']);
+					//Get the name
+					$name = $values[0];
+					//Throw the platforms in an array for passing through to the getVideos function
+					$platforms = [$values[1],$values[2],$values[3]];
+					getVideos($name,$platforms);
 				}
 				echo "</div>";
 			?>
